@@ -26,7 +26,8 @@ Git과 GitHub을 이용한 협업 프로젝트 관리 flow (Fork 방식)
   
 <br></br>
 ## ✅ Git과 Github을 이용한 버전관리 flow
-![ㅇ (2)](https://github.com/user-attachments/assets/9a83f4be-77ee-4d88-bbe8-291ddf6189d7)
+![git과 github를 이용한 협업 flow](https://github.com/user-attachments/assets/2c9a8107-7f35-460f-bcca-44e24dae6161)
+
 
 
 <br></br>
