@@ -143,21 +143,27 @@ git fetch origin main
 > 
 > 팀원들과 협업할 때 Git 저장소를 어떻게 관리하셨나요?
 > 
-### 질문2
-> 예를 들어 원격 저장소(origin, upstream) 관리, 브랜치 전략, 충돌 해결 등 전반적인 협업 흐름을 설명해주세요.
 
 <br></br>
 ### 내가 생각한 답변1
-> Git과 GitHub를 활용한 협업에서는 저장소를 `로컬 저장소`와 `원격 저장소`로 나누어 관리했습니다.
+> Git과 GitHub를 활용한 협업에서는 저장소를 **로컬 저장소와 원격 저장소**로 나누어 관리했습니다.
 > 
-> 원격 저장소는 보통 `Upstream`과 `Origin`이라는 이름으로 구분되는데,  
+> 원격 저장소는 보통 **Upstream**과 **Origin**이라는 이름으로 구분되는데,  
 > 
 > Upstream은 팀 프로젝트의 원본 저장소, Origin은 Upstream을 개인이 Fork한 원격 저장소입니다.  
 > 
 > 협업 초기에는 Upstream에서 Fork하여 개인 origin 저장소를 만들고, origin을 로컬에 clone하여 개발을 시작했습니다.
 >
-> 작업 후에는 Origin에 Push 후, GitHub에서 Pull Request를 생성하고 팀원들과 코드 리뷰를 거쳐 Upstream 저장소에 병합하는 방식으로 협업했습니다.
+> 작업 후에는 Origin에 Push 후, GitHub에서 **Pull Request를 생성하고 팀원들과 코드 리뷰**를 거쳐 Upstream 저장소에 병합하는 방식으로 협업했습니다.
 
+<br></br>
+
+---
+
+
+### 질문2
+> 원격 저장소(origin, upstream) 관리, 브랜치 전략, 충돌 해결 등 전반적인 협업 흐름을 설명해주세요.
+<br></br>
 ### 내가 생각한 답변2
 > 그 후 main혹은 develop 브랜치에서 분기해서 `feature/기능명` `hotfix/버그명` 등으로 명명하여 `브랜치를 관리`하였습니다.
 > 
