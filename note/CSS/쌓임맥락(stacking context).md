@@ -40,7 +40,7 @@
 4. `div1`은 `position:relative`, `z-index:auto` => 쌓임맥락 생성조건에 맞지 않는다.
 5. `div2`는 `position:absolute`, `z-index:2` => 쌓임맥락이 생성된다.
 
-    > 단, 부모요소인 `div1`은 쌓임맥락을 생성하지 않기 때문에 `div2`에서 가장 가까운 위치 지정 컨텍스트(positioned ancestor)은 `body`가 된다.
+    > 단, 부모요소인 `div1`은 쌓임맥락을 생성하지 않기 때문에 `div2`에서 가장 가까운 위치 지정 컨텍스트(positioned ancestor)은 `루트`가 된다.
     > 
     > 따라서 `div2`의 쌓임맥락은 `div1`의 영향을 받지 않는다.
 
