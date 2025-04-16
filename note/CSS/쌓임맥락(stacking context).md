@@ -35,21 +35,21 @@
 
 
 
-1. div2는 div1의 자식요소이다.
-2. div4는 div3의 자식요소이다.
-4. div1은 `position:relative`, `z-index:auto` => 쌓임맥락 생성조건에 맞지 않는다.
-5. div2는 `position:absolute`, `z-index:2` => 쌓임맥락이 생성된다.
+1. `div2`는 `div1`의 자식요소이다.
+2. `div4`는 `div3`의 자식요소이다.
+4. `div1`은 `position:relative`, `z-index:auto` => 쌓임맥락 생성조건에 맞지 않는다.
+5. `div2`는 `position:absolute`, `z-index:2` => 쌓임맥락이 생성된다.
 
-    > 단, 부모요소인 div1은 쌓임맥락을 생성하지 않기 때문에 div2에서 가장 가까운 위치 지정 컨텍스트(positioned ancestor)은 body가 된다.
+    > 단, 부모요소인 `div1`은 쌓임맥락을 생성하지 않기 때문에 `div2`에서 가장 가까운 위치 지정 컨텍스트(positioned ancestor)은 `body`가 된다.
     > 
-    > 따라서 div2의 쌓임맥락은 div1의 영향을 받지 않는다.
+    > 따라서 `div2`의 쌓임맥락은 `div1`의 영향을 받지 않는다.
 
-6. div3은 `position:relative`, `z-index:1` => 쌓임맥락이 생성된다.
-7. div4는 `position:absolute`, `z-index:10` => 쌓임맥락이 생성된다.
+6. `div3`은 `position:relative`, `z-index:1` => 쌓임맥락이 생성된다.
+7. `div4`는 `position:absolute`, `z-index:10` => 쌓임맥락이 생성된다.
 
-    > div4의 가장 가까운 위치 지정 컨텍스트는 div3이므로, div4는 div3 위에 배치된다.
+    > `div4`의 가장 가까운 위치 지정 컨텍스트는 `div3`이므로, `div4`는 `div3` 위에 배치된다.
 
 ### 결론 : `div1` → `div3` → `div4` → `div2`
-- 가장 상위 div중 z-index가 가장 높은 div2가 제일 위에 배치
-- 가장 상위 div중 z-index가 두번째로 높은 div3과 그 위에 자식요소인 div4 배치
-- 쌓임맥락을 생성하지 않는 div1이 맨 아래에 배치
+- z-index가 가장 높은 `div2`가 제일 위에 배치
+- z-index가 두번째로 높은 `div3`과 그 위에 자식요소인 `div4` 배치
+- 쌓임맥락을 생성하지 않는 `div1`이 맨 아래에 배치
