@@ -5,6 +5,11 @@
 - 가상의 z축을 사용하여 html요소의 배치를 3차원 관점으로 보는 것
 - 요소들이 겹칠 때 어떤 것을 앞쪽으로 배치할 지 우선순위를 정하는 것
 
+### ✔️position
+- 문서 상에 요소를 배치하는 방법을 결정하는 속성
+### ✔️z-index
+- 위치 지정 요소(position)의 배치 순서를 결정하는 속성
+
 ## ✅ 쌓임 맥락의 생성 조건
 
 |조건|
@@ -17,12 +22,7 @@
 |`그리드(grid)` 컨테이너의 자식 중 `z-index`가 auto가 아닌 요소.|
 |`opacity`가 1보다 작은 요소. (불투명도 명세 참고)|
 |`mix-blend-mode`가 normal이 아닌 요소.|
-|다음 속성 중 하나라도 none이 아닌 값을 가진 요소.|
-|`transform`|
-|`filter`|
-|`backdrop-filter`|
-|`perspective`|
-|`clip-path`|
+|다음 속성 중 하나라도 none이 아닌 값을 가진 요소.<br></br>`transform`,`filter`,`backdrop-filter`,`perspective`,`clip-path`|
 |`mask` / `mask-image` / `mask-border`|
 |`isolation`이 isolate인 요소.|
 |will-change의 값으로, 초깃값이 아닐 때 새로운 쌓임 맥락을 생성하는 속성을 지정한 요소.|
