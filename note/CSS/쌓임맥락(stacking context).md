@@ -6,6 +6,7 @@
 - 요소들이 겹칠 때 어떤 것을 앞쪽으로 배치할 지 우선순위를 정하는 것
 
 ## ✅ 쌓임 맥락의 생성 조건
+
 |조건|
 |---|
 |문서의 루트 요소. (<html>)|
@@ -28,4 +29,13 @@
 |contain이 layout, paint, 또는 둘 중 하나를 포함하는 값(strict, content 등)인 요소.|
 |top layer에 배치된 요소와 이에 상응하는 ::backdrop. fullscreen 및 popover 요소들을 예로 들 수 있습니다.|
 
-예제 https://codepen.io/fqdciufm-the-looper/pen/jEEOrvG
+## ✅ 예제
+
+https://codepen.io/fqdciufm-the-looper/pen/jEEOrvG
+
+1. div2는 div1의 자식요소이다.
+2. div4는 div3의 자식요소이다.
+4. div1은 `position:relative`, `z-index:auto` => 쌓임맥락 생성조건에 맞지 않는다.
+5. div2는 `position:absolute`, `z-index:2` => 쌓임맥락이 생성된다. 단, 부모요소인 div1은 쌓임맥락을 생성하지 않기 때문에 div2에서 가장 가까운 위치 지정 컨텍스트(positioned ancestor)은 body가 된다.
+6. div3은 `position:relative`, `z-index:1` => 쌓임맥락이 생성된다.
+7. div4는 `position:absolute`, `z-index:10` => 쌓임맥락이 생성된다.
