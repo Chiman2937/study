@@ -30,7 +30,7 @@
 |Multicol containers(테이블?) column=count 나 column-width가 auto가 아닌 위치에 있는 요소(column-count: 1인 요소를 포함)|
 |column-span: all, even when the column-span: all element isn't contained by a multicol container.|
 
-### 예제링크 : https://codepen.io/fqdciufm-the-looper/pen/OPPJaoN
+### 예제 : https://codepen.io/fqdciufm-the-looper/pen/OPPJaoN
 - 예제에서 BFC가 새로 생성된 영역은 `빨간색 테두리`가 적용 되어있다.
 
 1. `<html>`은 `BFC`이다.
@@ -40,26 +40,63 @@
 
     > `div1`은 독립된 공간이 됨
 
+### 각 BFC의 특징
+- 어떤 속성이 지정되어 BFC가 생성될 때 BFC요소들은 각각 다른 특징을 가진다.
+  
+|요소|부모BFC의 레이아웃 영역을 차지하는가?|부모 요소를 기준으로 배치되는가?|부모의 배치 규칙을 따르는가?|
+|-|-|-|-|
+|`float: none`이 아닌 요소|✅|✅|❌(out of flow)|
+|`position: absolute/fixed`인 요소|❌|⛔️가장 가까운 `position context`의 기준으로 배치|❌|
+|`overflow: visible/clip` 이 아닌 요소|✅|✅|✅|
+|`display: flow-root`인 요소|✅|✅|✅|
+
 <br></br>
 ## ✅ BFC의 규칙
 새롭게 BFC가 정의된 요소는 다음 내용과 같은 규칙이 적용된다.
 
+### 🔍 MDN에 기술되어있는 BFC의 규칙
+
+- BFC의 자식 float 요소는 BFC에 포함되고 레이아웃에 영향을 준다.(Contain internal floats)
+  
+    - 하지만 부모가 BFC가 아닐 경우 부모요소는 float요소를 감싸지 않고 가장 가까운 조상 BFC가 float요소를 감싼다.
+<br></br>
+    > 예제 : https://codepen.io/fqdciufm-the-looper/pen/vEEEayQ
+
+    > 예제에서 `<div2>`는 BFC가 아닌`<div1>`의 레이아웃에 영향을 주지 않지만, 상위 BFC인 `<html>`의 레이아웃에 영향을 주고 있다.
+    >
+    > 즉, float요소는 부모 요소가 BFC가 아니라면 위치는 부모를 기준으로 배치되지만 레이아웃에 영향을 주지 않고, 조상 중 BFC가 있다면 해당 BFC의 레이아웃에 영향을 준다(예제에서는 `<html>`)
+    >
+    > `float: left` 버튼을 눌러 `<div1>`에 float 속성을 적용시켜보면,`<div1>`은 이제 BFC가 되었기 때문에 `<div2>`가 `<div1>`의 레이아웃에 영향을 주게 된다.
+    
+    |기준|기준이 되는 조상|
+    |---|---|
+    |위치|부모 요소를 기준으로 배치됨|
+    |레이아웃|가장 가까운 BFC인 조상의 레이아웃에 영향을 줌|
+  
+- BFC의 형제 float 요소는 BFC요소와 겹치지 않고 옆으로 밀어낸다.(Exclude external floats)
+- 마진상쇄를 막는다.(supress margin collapsing)
+
 ### 🔍 주요 규칙
 - normal flow 기준으로 수직 정렬한다.(normal flow 규칙을 적용 받은 요소를 in flow 요소라고 함)
 
-|구분| 명칭| 종류 |
-|-|-|-|
-|normal flow 규칙을 적용 받는 요소| in flow | 기본 block, inline 요소 등 |
-|normal flow 규칙을 적용 받지 않는 요소 | out of flow | `float:none이 아닌` 요소,`position: absolute/fixed` 인 요소 |
+    |구분| 명칭| 종류 |
+    |-|-|-|
+    |normal flow 규칙을 적용 받는 요소| in flow | 기본 block, inline 요소 등 |
+    |normal flow 규칙을 적용 받지 않는 요소 | out of flow | `float:none이 아닌` 요소,`position: absolute/fixed` 인 요소 |
   
 - out of flow 요소는 normal flow의 규칙을 적용받지 않고, 해당 요소의 특성에 따라 독립적으로 배치된다.
-- BFC의 자식 float 요소는 BFC에 포함되고 레이아웃에 영향을 준다.(Contain internal floats)
-- BFC의 부모 float 요소는 BFC를 포함하지만 BFC는 부모 Float 요소의 레이아웃에 영향을 주지 않는다.(Exclude external floats)
-- BFC의 자식 `position: absolute/fixed` 요소는 BFC에 포함은 되지만, 레이아웃에 영향을 주지 않는다.
-- BFC의 부모 `position: absolute/fixed` 요소는 BFC를 포함하지만, BFC는 부모 `position: absolute/fixed` 요소의 레이아웃에 영향을 주지 않는다.
-- 마진상쇄를 막는다.(supress margin collapsing)
-- BFC의 자식 `overflow: visible/clip이 아닌 요소`는 부모 BFC의 레이아웃에 영향을 주지만, 이 요소의 자식은 BFC의 레이아웃에 영향을 주지 않는다.
-- BFC는 부모 BFC의 레이아웃에 영향을 주지 않는다.
+ 
+    > float속성 : https://github.com/Chiman2937/study/blob/main/note/CSS/float%EC%86%8D%EC%84%B1.md
+
+- BFC의 자식 `position: absolute/fixed` 요소는 DOM 구조 상 BFC에 포함은 되지만 레이아웃에 영향을 주지 않는다.
+  
+    |기준|기준이 되는 조상|
+    |---|---|
+    |위치|가장 가까운 `position context`인 조상|
+    |쌓임|가장 가까운 `stacking context`인 조상|
+    |레이아웃|부모가 BFC든 아니든 DOM 구조 상 부모에 포함되지만, 레이아웃에 영향을 주지 않음|
+
+- BFC는 레이아웃 독립성을 가지기 때문에 부모 BFC의 레이아웃에 영향을 주지 않는다.
 
 #### 레이아웃에 영향을 주지 않는다는 말은 아래와 같다.
 > BFC의 height에 포함되지 않는다.
