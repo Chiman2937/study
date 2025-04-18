@@ -10,7 +10,7 @@
 
 > 아직 공부 안한 부분은 영어
 > 
-> 원본 : https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Block_formatting_context
+> 원문 : https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_display/Block_formatting_context
 
 |조건|
 |---|
@@ -30,7 +30,6 @@
 |Multicol containers(테이블?) column=count 나 column-width가 auto가 아닌 위치에 있는 요소(column-count: 1인 요소를 포함)|
 |column-span: all, even when the column-span: all element isn't contained by a multicol container.|
 
-## ✅ 예제
 ### 예제링크 : https://codepen.io/fqdciufm-the-looper/pen/OPPJaoN
 - 예제에서 BFC가 새로 생성된 영역은 `빨간색 테두리`가 적용 되어있다.
 
@@ -40,3 +39,14 @@
 4. `div1`에 `position: absolute`를 설정하게 되면 새로운 `BFC`가 되기 때문에, `div1`의 배치는 `<html>`에 의해 결정되지 않는다.
 
     > `div1`은 독립된 공간이 됨
+
+<br></br>
+## ✅ BFC가 기존 레이아웃에 끼치는 영향
+새롭게 BFC가 정의된 요소는 다음 내용과 같이 Formatting Context 레이아웃에 영향을 준다.
+- 내부(자식)의 float 요소를 포함한다.(Contain internal floats)
+- 외부(부모)의 float 요소를 제외한다.(Exclude external floats)
+- 마진상쇄를 막는다.(supress margin collapsing)
+
+먼저 예제를 살펴보면, `<div>` 안에 
+
+## ✅ 예제
