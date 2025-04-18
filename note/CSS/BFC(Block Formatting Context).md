@@ -57,34 +57,15 @@
 ### 🔍 MDN에 기술되어있는 BFC의 규칙
 
 - BFC의 자식 float 요소는 BFC에 포함되고 레이아웃에 영향을 준다.(Contain internal floats)
-  
-    - 하지만 부모가 BFC가 아닐 경우 부모요소는 float요소를 감싸지 않고 가장 가까운 조상 BFC가 float요소를 감싼다.
-<br></br>
-    > 예제 : https://codepen.io/fqdciufm-the-looper/pen/vEEEayQ
-
-    > 예제에서 `<div2>`는 BFC가 아닌`<div1>`의 레이아웃에 영향을 주지 않지만, 상위 BFC인 `<html>`의 레이아웃에 영향을 주고 있다.
-    >
-    > 즉, float요소는 부모 요소가 BFC가 아니라면 위치는 부모를 기준으로 배치되지만 레이아웃에 영향을 주지 않고, 조상 중 BFC가 있다면 해당 BFC의 레이아웃에 영향을 준다(예제에서는 `<html>`)
-    >
-    > `float: left` 버튼을 눌러 `<div1>`에 float 속성을 적용시켜보면,`<div1>`은 이제 BFC가 되었기 때문에 `<div2>`가 `<div1>`의 레이아웃에 영향을 주게 된다.
-    
-    |기준|기준이 되는 조상|
-    |---|---|
-    |위치|부모 요소를 기준으로 배치됨|
-    |레이아웃|가장 가까운 BFC인 조상의 레이아웃에 영향을 줌|
-  
 - BFC의 형제 float 요소는 BFC요소와 겹치지 않고 옆으로 밀어낸다.(Exclude external floats)
 - 마진상쇄를 막는다.(supress margin collapsing)
 
 ### 🔍 주요 규칙
-- normal flow 기준으로 수직 정렬한다.(normal flow 규칙을 적용 받은 요소를 in flow 요소라고 함)
+- normal flow 기준으로 수직 정렬한다.
 
-    |구분| 명칭| 종류 |
-    |-|-|-|
-    |normal flow 규칙을 적용 받는 요소| in flow | 기본 block, inline 요소 등 |
-    |normal flow 규칙을 적용 받지 않는 요소 | out of flow | `float:none이 아닌` 요소,`position: absolute/fixed` 인 요소 |
-  
-- out of flow 요소는 normal flow의 규칙을 적용받지 않고, 해당 요소의 특성에 따라 독립적으로 배치된다.
+    > Normal Flow란? : https://github.com/Chiman2937/study/blob/main/note/CSS/Normal%20Flow.md
+
+- out of flow 요소는 normal flow의 규칙을 적용받지 않는 BFC이며, 해당 요소의 특성에 따라 독립적으로 배치된다.
  
     > float속성 : https://github.com/Chiman2937/study/blob/main/note/CSS/float%EC%86%8D%EC%84%B1.md
 
@@ -98,14 +79,11 @@
 
 - BFC는 레이아웃 독립성을 가지기 때문에 부모 BFC의 레이아웃에 영향을 주지 않는다.
 
-#### 레이아웃에 영향을 주지 않는다는 말은 아래와 같다.
-> BFC의 height에 포함되지 않는다.
-> 
-> BFC의 요소 정렬 규칙에서 벗어난다.
+<br></br>
+### ❓레이아웃에 영향을 주지 않는다?
 
-### 그 외
-
-
-먼저 예제를 살펴보면, `<div>` 안에 
-
-## ✅ 예제
+- 레이아웃에 영향을 주지 않는다는 말은 아래와 같다.
+  
+    > BFC의 요소 정렬 규칙에서 벗어난다.
+    >
+    > 그렇다고 자식 BFC가 부모 BFC의 영역을 차지하지 않는다는 말은 아니다.
