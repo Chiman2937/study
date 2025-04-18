@@ -41,11 +41,33 @@
     > `div1`은 독립된 공간이 됨
 
 <br></br>
-## ✅ BFC가 기존 레이아웃에 끼치는 영향
-새롭게 BFC가 정의된 요소는 다음 내용과 같이 Formatting Context 레이아웃에 영향을 준다.
-- 내부(자식)의 float 요소를 포함한다.(Contain internal floats)
-- 외부(부모)의 float 요소를 제외한다.(Exclude external floats)
+## ✅ BFC의 규칙
+새롭게 BFC가 정의된 요소는 다음 내용과 같은 규칙이 적용된다.
+
+### 🔍 주요 규칙
+- normal flow 기준으로 수직 정렬한다.(normal flow 규칙을 적용 받은 요소를 in flow 요소라고 함)
+
+|구분| 명칭| 종류 |
+|-|-|-|
+|normal flow 규칙을 적용 받는 요소| in flow | 기본 block, inline 요소 등 |
+|normal flow 규칙을 적용 받지 않는 요소 | out of flow | `float:none이 아닌` 요소,`position: absolute/fixed` 인 요소 |
+  
+- out of flow 요소는 normal flow의 규칙을 적용받지 않고, 해당 요소의 특성에 따라 독립적으로 배치된다.
+- BFC의 자식 float 요소는 BFC에 포함되고 레이아웃에 영향을 준다.(Contain internal floats)
+- BFC의 부모 float 요소는 BFC를 포함하지만 BFC는 부모 Float 요소의 레이아웃에 영향을 주지 않는다.(Exclude external floats)
+- BFC의 자식 `position: absolute/fixed` 요소는 BFC에 포함은 되지만, 레이아웃에 영향을 주지 않는다.
+- BFC의 부모 `position: absolute/fixed` 요소는 BFC를 포함하지만, BFC는 부모 `position: absolute/fixed` 요소의 레이아웃에 영향을 주지 않는다.
 - 마진상쇄를 막는다.(supress margin collapsing)
+- BFC의 자식 `overflow: visible/clip이 아닌 요소`는 부모 BFC의 레이아웃에 영향을 주지만, 이 요소의 자식은 BFC의 레이아웃에 영향을 주지 않는다.
+- BFC는 부모 BFC의 레이아웃에 영향을 주지 않는다.
+
+#### 레이아웃에 영향을 주지 않는다는 말은 아래와 같다.
+> BFC의 height에 포함되지 않는다.
+> 
+> BFC의 요소 정렬 규칙에서 벗어난다.
+
+### 그 외
+
 
 먼저 예제를 살펴보면, `<div>` 안에 
 
