@@ -12,7 +12,17 @@
 
 ## ✅ 쌓임 순서
 
-### 1. `z-index < 0`인 `positioned` 요소
+### 1. `z-index < 0`이고 다음 중 하나인 요소
+
+  - `positioned` 인 요소
+  - 쌓임맥락을 만드는 조건을 가진 속성이 적용된 요소(opacity 등)
+    
+    > ※ 이 요소들은 쌓임맥락을 생성함. 즉,
+    > 
+    > `z-index가 같다면 html 작성 순서`를 따름
+    > 
+    > `z-index가 다르다면 z-index가 높은 요소일 수록 위쪽`에 배치됨
+    
 ### 2. `position:static`인 요소
 ### 3. `z-index: auto`이고 다음 중 하나인 요소
    
