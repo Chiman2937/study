@@ -10,4 +10,10 @@
 |메모리 해제|사용이 종료 된 후 자동으로 해제|JS에서는 GC(가비지 콜렉터)가 해제해줌|
 |접근 방식|LIFO,순차적|비순차적(주소 기반)|
 
+<br></br>
+## ✅ 스택과 힙이 메모리를 할당하는 방법
+![image](https://github.com/user-attachments/assets/807327cb-8518-4657-8ac3-9bab3d51a2de)
+
+<br></br>
+## ✅ 변수를 선언할 때 메모리에 값을 할당하는 방법
 ![image](https://github.com/user-attachments/assets/2e4167cd-72be-405c-bf7e-8e621b351817)
