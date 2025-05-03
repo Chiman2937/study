@@ -7,9 +7,10 @@
 함수가 **어떻게 호출되었느냐**에 따라 **동적으로 바인딩**되며,  
 **호출 주체**에 따라 `this`가 가리키는 대상이 달라진다.
 
+<br></br>
 ---
 
-## 📊 상황별 this가 가리키는 대상
+### 📊 상황별 this가 가리키는 대상
 
 | 상황                 | this가 가리키는 대상                     |
 |----------------------|-------------------------------------------|
@@ -19,9 +20,10 @@
 | call, apply, bind 사용 | 명시적으로 지정한 객체                    |
 | 화살표 함수          | 선언 당시 **외부 렉시컬 스코프의 `this`** |
 
+<br></br>
 ---
 
-## 🔍 전역 컨텍스트에서의 this
+### 🔍 전역 컨텍스트에서의 this
 
 ```js
 console.log(this);
@@ -32,9 +34,11 @@ console.log(this);
 `global` //Node.js 환경
 `undefined` //strict mode
 ```
+
+<br></br>
 ---
 
-## 🔍 일반 함수에서의 this
+### 🔍 일반 함수에서의 this
 
 ```js
 function newFunc() {
@@ -48,9 +52,10 @@ newFunc();
 - Node.js: `global`  
 - strict mode: `undefined`
 
+<br></br>
 ---
 
-## 🔍 객체 메서드로 호출한 경우
+### 🔍 객체 메서드로 호출한 경우
 
 ```js
 const obj = {
@@ -65,9 +70,10 @@ obj.method(); // obj가 호출 주체
 
 - 호출한 주체가 `obj`이므로 `this === obj`
 
+<br></br>
 ---
 
-## 🔍 생성자 함수에서의 this
+### 🔍 생성자 함수에서의 this
 
 ```js
 function NewFunc(name) {
@@ -89,9 +95,10 @@ NewFunc { name: 'Kim' }
 3. 따라서 `console.log(this)`는 `obj`를 출력한다.
 4. `name` 프로퍼티가 추가되었으므로 `NewFunc { name: 'Kim' }` 형태로 출력된다.
 
+<br></br>
 ---
 
-## 🔍 call, apply, bind
+### 🔍 call, apply, bind
 
 ```js
 function newFunc() {
@@ -106,9 +113,10 @@ newFunc.call({ name: 'Kim' });
   > 전역 객체가 “야, 너는 지금부터 나라고 생각하고 이 함수 좀 대신 실행해줘”라고 전달된 객체에 지시한 것과 같다.
 - 따라서 `this.name`은 `'Kim'`이 되고 `'Kim'`이 출력된다.
 
+<br></br>
 ---
 
-## 🔍 화살표 함수에서의 this
+### 🔍 화살표 함수에서의 this
 
 ```js
 const newFunc = () => {
@@ -131,4 +139,5 @@ window  // 브라우저
 - **Node.js**: 모듈 스코프의 `this`는 `{}` → 결과도 `{}`  
 - **브라우저**: 최상위 스코프가 곧 전역 객체 `window` → 결과도 `window`
 
+<br></br>
 ---
