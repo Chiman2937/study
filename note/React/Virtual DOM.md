@@ -86,6 +86,8 @@ button을 클릭했을 때 페이지가 리렌더링 되는 과정을 살펴보�
 
 <br></br>
 ### ✔️ 4. Render Phase (diffing)
+여기서 render는 화면은 렌더링 한다는 의미가 아닌, 현재 상태를 기반으로 새로운 UI 구조를 메모리상에 준비한다는 의미이다.
+
 state를 참조하여 Virtual DOM을 새로 만들고 이전에 생성했었던 Virtual DOM과 비교하여 Patch Plan을 생성한다.
 
 <details>
