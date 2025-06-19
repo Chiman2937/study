@@ -119,15 +119,27 @@ const getProduct = async (id) => {
 
 ### ✅ 요청 및 응답 인터셉터
 Axios는 Api 요청 및 응답 과정에서 요청 정보를 수정하거나 응답을 가공할 수 있는 **인터셉터** 기능을 제공한다.
+
 이 기능을 활용하면 반복되는 설정 코드(예: 토큰 부착, 에러 메시지 처리 등)을 한 곳에서 일괄적으로 관리할 수 있다.
+
 fetch는 인터셉터 기능을 지원하지 않기 때문에 요청 및 응답을 일괄적으로 처리하고 싶을 경우 직접 코드를 작성해 주어야 한다.
 
 #### ❗ fetch의 경우
 fetch를 사용할때도 커스텀훅으로 try/catch 처리를 하는 방법 등으로 일괄적으로 관리가 가능하기는 하지만, 한계가 존재한다.
 
+먼저 설명하기 전에 fetch를 이용한 Api 요청 과정을 도식화해서 살펴보면 아래와 같다.
+
+![image](https://github.com/user-attachments/assets/41201e4d-6c13-4a8e-84d7-134be86386da)
+
+이 사진을 보면 커스텀 훅에서도 try/catch를 통해 분기처리를 하고, 각 Api함수에서도 Error/Response 반환 처리를 하면서 불필요하게 여러 군데에서 오류 처리를 하고 있는 것을 알 수 있다.
+
+예시를 통해 살펴보자.
+
 아래와 같이 응답을 일괄적으로 처리하는 useAsync라는 커스텀 훅이 있다고 가정하자.
+
 이 커스텀 훅에서는 전달받은 api함수 정보를 이용해 api요청을 보내고 응답/오류 등을 일괄적으로 처리하고 있다.
 
+- useAsync(Api 응답 일괄처리 커스텀 훅)
 ```jsx
 import { useEffect, useState } from "react";
 
@@ -160,9 +172,11 @@ export const useAsync = (asyncFunction, options) => {
 
 ```
 
-하지만 이 기능을 정상적으로 이용하려면, 각 api함수에서 별도로 오류 처리를 하는 구문을 작성해주어야 한다.
+하지만 이 기능을 정상적으로 이용하려면, 각 Api함수에서 별도로 오류 처리를 하는 구문을 작성해주어야 한다.
 
-Api함수 관리 파일
+호출한 Api함수에서 오류를 반환해주어야 커스텀 훅에서 catch로 error를 감지할 수 있기 때문이다.
+
+- Api함수 관리 파일
 ```js
 //BASE_URL을 Api함수 관리 파일에서 전역적으로 관리한다.
 const BASE_URL = 'https://panda-market-api.vercel.app';
@@ -188,10 +202,6 @@ export const getItemComments = async (id) => {
 }
 ```
 
-이 과정을 도식화해서 살펴보면 아래와 같다.
-
-![image](https://github.com/user-attachments/assets/41201e4d-6c13-4a8e-84d7-134be86386da)
-
 정리해보자면, useAsync와 같은 커스텀 훅에서 try/catch 분기 처리를 해준다고 하더라도 각 Api함수에서 각각 오류처리를 하는 구문을 작성을 해주어야 하고 있다.
 
 여기서 발생하는 문제를 짚어보자면 아래와 같다.
@@ -202,6 +212,10 @@ export const getItemComments = async (id) => {
 하지만 Axios를 사용하면, 각 Api함수에서 따로 오류처리 하는 부분까지 전부 인터셉터 기능을 이용해 일괄적으로 관리가능하다
 
 #### ✔️ Axios의 경우
+
+
+Axios를 이용한 Api요청 과정을 도식화해서 살펴보면 아래와 같다.
+![image](https://github.com/user-attachments/assets/425001e0-b6a5-44bb-ab72-f25c8f9f475e)
 
 
 <br></br>
