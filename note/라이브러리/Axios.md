@@ -118,7 +118,91 @@ const getProduct = async (id) => {
 ---
 
 ### ✅ 요청 및 응답 인터셉터
-// 추후 추가 예정
+Axios는 Api 요청 및 응답 과정에서 요청 정보를 수정하거나 응답을 가공할 수 있는 **인터셉터** 기능을 제공한다.
+이 기능을 활용하면 반복되는 설정 코드(예: 토큰 부착, 에러 메시지 처리 등)을 한 곳에서 일괄적으로 관리할 수 있다.
+fetch는 인터셉터 기능을 지원하지 않기 때문에 요청 및 응답을 일괄적으로 처리하고 싶을 경우 직접 코드를 작성해 주어야 한다.
+
+#### ❗ fetch의 경우
+fetch를 사용할때도 커스텀훅으로 try/catch 처리를 하는 방법 등으로 일괄적으로 관리가 가능하기는 하지만, 한계가 존재한다.
+
+아래와 같이 응답을 일괄적으로 처리하는 useAsync라는 커스텀 훅이 있다고 가정하자.
+이 커스텀 훅에서는 전달받은 api함수 정보를 이용해 api요청을 보내고 응답/오류 등을 일괄적으로 처리하고 있다.
+
+```jsx
+import { useEffect, useState } from "react";
+
+export const useAsync = (asyncFunction, options) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [result, setResult] = useState(null);
+
+  const getAsyncResult = async (options) => {
+    let result = null;
+    try {
+      setIsLoading(true);
+      setError(false);
+      result = await asyncFunction(options);
+      setResult(result);
+    } catch (e) {
+      setError(e);
+      return;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAsyncResult(options);
+  }, [options]);
+
+  return { isLoading, error, result };
+};
+
+```
+
+하지만 이 기능을 정상적으로 이용하려면, 각 api함수에서 별도로 오류 처리를 하는 구문을 작성해주어야 한다.
+
+Api함수 관리 파일
+```js
+//BASE_URL을 Api함수 관리 파일에서 전역적으로 관리한다.
+const BASE_URL = 'https://panda-market-api.vercel.app';
+
+export const getItemDetails = async (id) => {
+  const response = await fetch(`${BASE_URL}/products/${id}`);
+  // 응답 오류가 발생했을 경우 에러 처리를 하고있다.
+  if (!response.ok) {
+    throw new Error('품목을 불러오지 못했습니다.');
+  }
+  const body = await response.json();
+  return body;
+}
+
+export const getItemComments = async (id) => {
+  const response = await fetch(`${BASE_URL}/products/${id}/comments?limit=100`);
+  // 응답 오류가 발생했을 경우 에러 처리를 하고있다.
+  if (!response.ok) {
+    throw new Error('댓글을 불러오지 못했습니다.');
+  }
+  const body = await response.json();
+  return body;
+}
+```
+
+이 과정을 도식화해서 살펴보면 아래와 같다.
+
+![image](https://github.com/user-attachments/assets/41201e4d-6c13-4a8e-84d7-134be86386da)
+
+정리해보자면, useAsync와 같은 커스텀 훅에서 try/catch 분기 처리를 해준다고 하더라도 각 Api함수에서 각각 오류처리를 하는 구문을 작성을 해주어야 하고 있다.
+
+여기서 발생하는 문제를 짚어보자면 아래와 같다.
+
+1. 역할분리가 명확하지 않음
+2. 유지보수에 불리함
+
+하지만 Axios를 사용하면, 각 Api함수에서 따로 오류처리 하는 부분까지 전부 인터셉터 기능을 이용해 일괄적으로 관리가능하다
+
+#### ✔️ Axios의 경우
+
 
 <br></br>
 
