@@ -5,8 +5,16 @@ Axios는 node.js와 브라우저를 위한 Promise 기반 HTTP 클라이언트�
 
 서버 사이드에서는 네이티브 node.js의 http 모듈을 사용하고, 클라이언트(브라우저)에서는 XMLHttpRequests를 사용한다.
 
+<br></br>
+
+---
+
 ## 💡 Axios를 사용하는 이유
 Axios는 기본 내장함수는 fetch보다 더 편리한 기능들을 제공하기 때문에 많이 사용한다.
+
+<br></br>
+
+---
 
 ## 💡 Axios의 특징
 Axios의 공식문서에 따르면, Axios의 특징은 다음과 같다.
@@ -19,6 +27,9 @@ Axios의 공식문서에 따르면, Axios의 특징은 다음과 같다.
 - JSON 데이터 자동 변환
 - XSRF를 막기위한 클라이언트 사이드 지원
 
+<br></br>
+
+---
 
 ## 💡 Axios vs fetch
 Axios의 특징들에 대해 브라우저 내장 Api인 fetch와 비교 해보면 다음과 같다.
@@ -32,6 +43,10 @@ Axios의 특징들에 대해 브라우저 내장 Api인 fetch와 비교 해보�
 | JSON 자동 변환        | ✅ 자동으로 JSON 파싱 (`res.data`)             | ❌ `res.json()`을 수동 호출해야 함                                |
 | XSRF 방지 지원        | ✅ 기본 지원 (`withCredentials`, 자동 헤더 설정 등) | ❌ 수동 처리 필요 (쿠키/헤더 직접 설정)                                 |
 
+<br></br>
+
+---
+
 ## 💡 Axios의 특징에 대해 파헤쳐보기
 ### ✅ 브라우저를 위해 XMLHttpRequests 생성
 Axios는 ES6 이전부터 사용된 구형 브라우저 호환성을 고려해 XMLHttpRequest 기반으로 만들어졌다.
@@ -41,6 +56,10 @@ Axios는 ES6 이전부터 사용된 구형 브라우저 호환성을 고려해 X
 > XHR은 AJAX 프로그래밍에서 많이 활용된다.
 > XHR 객체는 서버와 상호작용하기 위해 사용되며, 페이지를 새로고침 하지 않고도 URL에서 데이터를 가져올 수 있다.
 > 이를 활용하여 사용자의 작업을 방해하지 않고 페이지의 일부를 업데이트 할 수 있다.
+
+<br></br>
+
+---
 
 ### ✅ node.js를 위해 http 요청 생성
 결론부터 말하자면 fetch는 환경에 따라 구현이 다르기 때문에 문제가 생길 여지가 있고, Axios는 그런 차이를 내부에서 알아서 처리해주는 안정적인 선택지이다.
@@ -60,6 +79,10 @@ fetch와 node-fetch는 동일하게 작동하긴 한다.
 Axios는 브라우저와 Node.js 환경 둘다 동일한 API와 기능을 제공하기 때문에 위의 문제점에서 자유롭다.
 
 Axios는 브라우저에서는 XMLHttpRequest, Node.js 환경에서는 http/https 모듈을 알아서 사용하여 환경에 맞게 처리한다.
+
+<br></br>
+
+---
 
 ### ✅ Promise API를 지원
 Promise API를 지원한다는 말은 곧 Axios로 보낸 HTTP 요청 결과를 `then`,`catch` / `async`,`await`와 같은 비동기 방식으로 처리할 수 있다는 말이다.
@@ -90,11 +113,23 @@ const getProduct = async (id) => {
 
 ```
 
+<br></br>
+
+---
+
 ### ✅ 요청 및 응답 인터셉터
 // 추후 추가 예정
 
+<br></br>
+
+---
+
 ### ✅ 요청 취소
 // 추후 추가 예정
+
+<br></br>
+
+---
 
 ### ✅ JSON 데이터 자동 변환
 fetch를 사용하면 응답(Response)을 수동으로 .json() 메서드를 호출해 JSON으로 파싱해야 한다.
@@ -103,13 +138,13 @@ fetch를 사용하면 응답(Response)을 수동으로 .json() 메서드를 호�
 #### ❗ fetch를 사용한 경우
 ```js
 export const getItemDetails = async (id) => {
-	const response = await fetch(`${BASE_URL}/products/${id}`);
-	if (!response.ok) {
+  const response = await fetch(`${BASE_URL}/products/${id}`);
+  if (!response.ok) {
     throw new Error('품목을 불러오지 못했습니다.');
   }
   // response 값을 json 형태로 파싱 후 return 해줘야 함
-	const body = await response.json();
-	return body;
+  const body = await response.json();
+  return body;
 }
 ```
 
@@ -121,5 +156,9 @@ httpClient.interceptors.response.use(
   (res) => res.data,
   (error) => { /* ... */ }
 ```
+
+<br></br>
+
+---
 
 ### ✅ XSRF를 막기위한 클라이언트 사이드 지원
