@@ -206,16 +206,103 @@ export const getItemComments = async (id) => {
 
 여기서 발생하는 문제를 짚어보자면 아래와 같다.
 
-1. 역할분리가 명확하지 않음
-2. 유지보수에 불리함
+1. 오류 처리, URL 처리 등에서 역할분리가 명확하지 않음
+2. 각 Api함수마다 오류 처리를 하고 있어서 유지보수에 불리함
 
 하지만 Axios를 사용하면, 각 Api함수에서 따로 오류처리 하는 부분까지 전부 인터셉터 기능을 이용해 일괄적으로 관리가능하다
 
 #### ✔️ Axios의 경우
 
-
 Axios를 이용한 Api요청 과정을 도식화해서 살펴보면 아래와 같다.
 ![image](https://github.com/user-attachments/assets/425001e0-b6a5-44bb-ab72-f25c8f9f475e)
+
+Axios를 통해 인터셉터와 상호작용하며 요청, 응답을 일괄적으로 관리할 수 있다.
+
+먼저 Axios를 사용하기 위해 인스턴스 객체를 생성한다.
+
+이 때 Axios 인스턴스 객체가 http 요청을 관리하는 주체이기 때문에 변수명을 `httpClient`라고 명명했다.
+
+- httpClient
+```js
+const httpClient = axios.create({
+  // 공통URL도 axios의 속성을 이용해 관리 가능하다.
+  // 각 API 함수에서는 상대 경로만 지정하면 이 URL이 자동으로 붙는다.
+  baseURL: 'https://panda-market-api.vercel.app',
+
+  // 지정된 시간(ms) 안에 응답이 없으면 요청을 자동으로 중단한다.
+  timeout: 10_000,
+
+  // 모든 요청의 기본 headers를 설정할 수 있다.
+  // 여기서 Content-Type: application/json은 대부분의 API에 적합하지만, FormData 사용 시는 오히려 자동 설정되도록 주석처리하는 게 안전하다
+  // multipart/form-data는 직접 설정하면 boundary가 누락될 수 있음
+  headers: { 'Content-Type': 'application/json' },
+});
+```
+
+이 Axios 인스턴스 객체를 이용해 인터셉터를 생성하여 관리할 수 있다.
+
+- 요청 인터셉터
+```js
+httpClient.interceptors.request.use(
+  // access_token이 있을 경우 headers에 붙여주는 과정을 일괄적으로 처리할 수 있다.
+  config => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => Promise.reject(error)
+);
+```
+
+- 응답 인터셉터
+```js
+httpClient.interceptors.response.use(
+  // 성공 응답은 그대로 전달
+  // 이때 Axios의 응답값은 .data 속성에 저장되기 때문에 response.data를 반환해주어야 한다.
+  ( response ) => response.data,
+  // 에러 응답 처리
+  ( error ) => {
+    const status = error.response?.status;
+    const messageMap = {
+      400: '잘못된 요청입니다. 입력값을 확인해주세요.',
+      401: '로그인이 필요합니다. 로그인 페이지로 이동합니다.',
+      403: '접근 권한이 없습니다.',
+      404: '요청하신 자원을 찾을 수 없습니다.',
+      500: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+    };
+
+    const message = messageMap[status] || '알 수 없는 오류가 발생했습니다.';
+
+    // 401인 경우 로그인 페이지로 이동
+    if (status === 401) {
+      window.location.href = '/login';
+    }
+
+    // 에러는 그대로 throw해서 useAsync나 .catch에서 처리할 수 있게 함
+    return Promise.reject(error);
+  }
+);
+```
+
+이렇게 되면 각 Api함수에서는 요청만 관리하면 되기 때문에 유지보수 면에서 훨씬 안정적이다.
+
+```js
+import httpClient from './httpClient';
+// Axios에서 baseURL을 관리하므로 BASE_URL 변수를 관리할 필요가 없다.
+// const BASE_URL = 'https://panda-market-api.vercel.app';
+
+export const getItemDetails = async (id) => {
+  const data = httpClient.get(`/products/${id}`);
+  return data;
+}
+
+export const getItemComments = async (id) => {
+  const data = httpClient.get(`/products/${id}/comments?limit=100`);
+  return data;
+}
+```
 
 
 <br></br>
