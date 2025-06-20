@@ -311,6 +311,8 @@ export const getItemComments = async (id) => {
 
 ### ✅ 요청 취소
 // 추후 추가 예정
+요청을 취소하는 방법은 CancelToken과 AbortController API를 활용하는 방법이 있다.
+하지만 CancelToken은 v0.22.0 deprecated 되어 사용
 
 <br></br>
 
