@@ -197,6 +197,10 @@ Modal이 열려있는 상태에서 다른 페이지로 이동할 때(location이
 
 ```
 
+<br></br>
+
+---
+
 ### ❗ Modal 내부에서 클릭한 상태에서 Modal 외부로 드래그 후 클릭 해제하면 Modal이 close 되는 오류 수정
 MouseDown 될때의 컴포넌트 정보를 저장하고, MouseUp 될때의 컴포넌트 정보를 저장하여 둘다 Modal 컴포넌트 외부에서 이벤트가 발생했을 경우에만 Modal이 close되도록 수정하였다.
 
