@@ -387,8 +387,7 @@ const p = new Promise((resolve)=>{
 
 #### ✔️ AbortController 사용하기
 먼저 AbortController는 fetch에서도 사용할 수 있는 브라우저 내장(Web API)이다.
-
-fetch
+// 추후 내용 추가 예정
 
 ### ✅ JSON 데이터 자동 변환
 fetch를 사용하면 응답(Response)을 수동으로 .json() 메서드를 호출해 JSON으로 파싱해야 한다.
