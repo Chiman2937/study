@@ -9,13 +9,6 @@ Axios는 node.js와 브라우저를 위한 Promise 기반 HTTP 클라이언트�
 
 ---
 
-## 💡 Axios를 사용하는 이유
-Axios는 기본 내장함수는 fetch보다 더 편리한 기능들을 제공하기 때문에 많이 사용한다.
-
-<br></br>
-
----
-
 ## 💡 Axios의 특징
 Axios의 공식문서에 따르면, Axios의 특징은 다음과 같다.
 - 브라우저를 위해 XMLHttpRequests 생성
