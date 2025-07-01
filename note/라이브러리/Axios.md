@@ -49,13 +49,34 @@ Axios의 특징들에 대해 브라우저 내장 Api인 fetch와 비교 해보�
 
 ## 💡 Axios의 특징에 대해 파헤쳐보기
 ### ✅ 브라우저를 위해 XMLHttpRequests 생성
+fetch API는 Promise 기반이라 코드가 직관적이고 간결하며, async/await과 함께 쓰면 더 가독성이 좋아진다는 장점이 있긴 하지만, 구형 브라우저와는 호환이 되지 않는다는 문제가 있다.
+
 Axios는 ES6 이전부터 사용된 구형 브라우저 호환성을 고려해 XMLHttpRequest 기반으로 만들어졌다.
+
+Axios는 내부적으로 콜백 기반의 XHR을 사용을 하지만, 외부에서는 Promise 기반 API를 제공하도록 래핑하여 XHR의 단점을 해결하였다.
 
 > **XMLHttpRequest(XHR)란?**
 > 
 > XHR은 AJAX 프로그래밍에서 많이 활용된다.
 > XHR 객체는 서버와 상호작용하기 위해 사용되며, 페이지를 새로고침 하지 않고도 URL에서 데이터를 가져올 수 있다.
 > 이를 활용하여 사용자의 작업을 방해하지 않고 페이지의 일부를 업데이트 할 수 있다.
+
+<details>
+  <summary>🔍 XHR와 fetch API의 차이</summary>
+
+  | 항목                  | `XMLHttpRequest` (XHR)       | `fetch API`                             |
+  | ------------------- | ---------------------------- | --------------------------------------- |
+  | **도입 시기**           | 오래됨 (IE 7 등 구형 브라우저 지원)      | ES6 이후 (모던 브라우저 중심)                     |
+  | **코드 가독성**          | 콜백 기반 → 가독성 낮음               | `Promise` 기반 → 가독성 높음                   |
+  | **응답 처리**           | 상태 코드를 일일이 확인 (`readyState`) | 응답을 `then` 체이닝으로 처리                     |
+  | **지원 방식**           | 동기 / 비동기 모두 지원               | 기본은 비동기 (동기 X)                          |
+  | **Stream / Cancel** | 제한적                          | 일부 지원 (ReadableStream, AbortController) |
+  | **에러 처리**           | 직접 구현 필요                     | `try-catch` 또는 `.catch()`로 명확           |
+  | **타입 자동 처리**        | 수동 파싱 필요 (`JSON.parse()`)    | `.json()` 등 메서드 제공                      |
+  | **요청 시 헤더/타입 설정**   | 복잡한 설정 필요                    | 간결한 옵션 객체 (`headers`, `body` 등)         |
+  | **CORS 대응**         | 제한적                          | 상대적으로 더 유연                              |
+
+</details>
 
 <br></br>
 
@@ -387,7 +408,71 @@ const p = new Promise((resolve)=>{
 
 #### ✔️ AbortController 사용하기
 먼저 AbortController는 fetch에서도 사용할 수 있는 브라우저 내장(Web API)이다.
-// 추후 내용 추가 예정
+
+AbortController는 요청하는 쪽에서 생성해서 넘겨줘야한다.
+
+이번 예제에서는 useAsync에서 파라미터로 전달받은 Api를 호출하고 있으므로 useAsync에서 AbortController 인스턴스 객체를 만들어서 호출해줘야한다.
+
+useAsync
+```js
+import { useEffect, useState, useRef } from "react";
+
+export const useAsync = (asyncFunction, options) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [result, setResult] = useState(null);
+  const abortControllerRef = useRef(null); // ✅ AbortController ref 생성
+  // useRef는 리렌더링 시에도 값이 보존되는 참조 객체를 제공한다.
+  // AbortController는 요청마다 새로 생성되어야 하므로 요청이 여러번 발생해도 각 요청에 해당하는 AbortController를 참조할 수 있도록 만들기 위해 useRef를 사용한다.
+
+  const getAsyncResult = async (options) => {
+    const controller = new AbortController();        // ✅ 새 컨트롤러 생성
+    abortControllerRef.current = controller;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const data = await asyncFunction({ ...options, signal: controller.signal }); // ✅ signal 전달
+      setResult(data);
+    } catch (e) {
+      if (e.name !== 'CanceledError' && e.name !== 'AbortError') {
+        setError(e);
+      }
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    getAsyncResult(options);
+
+    return () => {
+      // ✅ 언마운트 또는 options 변경 시 요청 취소
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [options]);
+
+  return { isLoading, error, result };
+```
+
+```js
+import httpClient from './httpClient';
+
+export const getItemDetails = async ({id, signal}) => {
+  const data = httpClient.get(`/products/${id}`,{ signal );
+  return data;
+}
+
+export const getItemComments = async ({id, signal}) => {
+  const data = httpClient.get(`/products/${id}/comments?limit=100`, { signal });
+  return data;
+}
+```
 
 ### ✅ JSON 데이터 자동 변환
 fetch를 사용하면 응답(Response)을 수동으로 .json() 메서드를 호출해 JSON으로 파싱해야 한다.
