@@ -1,0 +1,312 @@
+name: PR Preview to EC2
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - '*-story'
+
+# 동일 브랜치의 이전 배포 작업 취소
+concurrency:
+  group: preview-deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  continuous-deployment:
+    runs-on: ubuntu-latest
+    steps:
+      # 1) GitHub 저장소 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2) 브랜치명 & 포트 계산
+      - name: Compute branch name & port
+        id: meta
+        run: |
+          RAW="${{ github.ref_name }}"
+          SANITIZED="$(echo "$RAW" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')"
+          PORT=$(( 5000 + $(echo -n "$SANITIZED" | cksum | awk '{print $1 % 1000}') ))
+          echo "name=$SANITIZED" >> $GITHUB_OUTPUT
+          echo "port=$PORT" >> $GITHUB_OUTPUT
+          echo "[DEBUG][META] ✅ RAW=$RAW"
+          echo "[DEBUG][META] ✅ SANITIZED=$SANITIZED"
+          echo "[DEBUG][META] ✅ BASE_PORT=$PORT"
+
+      # 2-1) PORT 값 디버그 출력
+      - name: Debug meta outputs
+        run: |
+          echo "[DEBUG][META] ✅ BRANCH=${{ steps.meta.outputs.name }}"
+          echo "[DEBUG][META] ✅ PORT=${{ steps.meta.outputs.port }}"
+
+      # 3) Node.js 환경 설정
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # 4) 의존성 설치
+      - name: Install dependencies
+        run: |
+          echo "[DEBUG][GHA] ⌛ npm 의존성 설치 진행 중..."
+          npm ci
+          echo "[DEBUG][GHA] ✅ npm 의존성 설치 완료"
+
+      # 5) 프로젝트 빌드
+      - name: Build project
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_JS_KEY_KAKAO: ${{ secrets.NEXT_PUBLIC_JS_KEY_KAKAO }}
+        run: |
+          echo "[DEBUG][GHA] ⌛ 프로젝트 빌드 진행 중..."
+          rm -rf .next
+          NEXT_CACHE_DISABLED=1 npm run build
+          echo "[DEBUG][GHA] ✅ 프로젝트 빌드 완료"
+
+      # 6) 배포용 파일 패키징
+      - name: Package deployment files
+        run: |
+          echo "[DEBUG][GHA] ⌛ 배포용 파일 패키징 진행 중..."
+
+          # 개발 의존성만 제거 (완전히 재설치하지 않고)
+          echo "[DEBUG][GHA] ⌛ 개발 의존성 제거 진행 중..."
+          BEFORE_SIZE=$(du -sh node_modules | cut -f1)
+          echo "[DEBUG][GHA] 🔍 BEFORE prune: $BEFORE_SIZE"
+          npm prune --omit=dev
+          AFTER_SIZE=$(du -sh node_modules | cut -f1)
+          echo "[DEBUG][GHA] 🔍 AFTER prune: $AFTER_SIZE"
+          echo "[DEBUG][GHA] ✅ 개발 의존성 제거 완료"
+
+          # 배포에 필요한 파일들만 선별해서 패키징
+          mkdir -p deploy-package
+
+          # Next.js 빌드 결과물
+          cp -r .next deploy-package/
+          cp -r public deploy-package/ 2>/dev/null || true
+
+          # 런타임에 필요한 파일들
+          cp package.json deploy-package/
+          cp package-lock.json deploy-package/ 2>/dev/null || true
+          cp next.config.* deploy-package/ 2>/dev/null || true
+
+          # 추가: config 폴더 복사
+          cp -r config deploy-package/ 2>/dev/null || true
+
+          # 최적화된 프로덕션 의존성
+          cp -r node_modules deploy-package/
+          echo "[DEBUG][GHA] 🔍 Copied node_modules size: $(du -sh deploy-package/node_modules | cut -f1)"
+          PACKAGE_SIZE=$(du -sh deploy-package | cut -f1)
+
+          RED="\033[1;31m"
+          GREEN="\033[1;32m"
+          BLUE="\033[1;34m"
+          CYAN="\033[1;36m"
+          RESET="\033[0m"
+
+          echo ""
+          echo -e "${CYAN}================== 📁 Deploy package info ==================${RESET}"
+          printf "${CYAN}%-30s${RESET} | %s\n" "node_modules" "$(du -sh deploy-package/node_modules | cut -f1)"
+          printf "${CYAN}%-30s${RESET} | %s\n" ".next" "$(du -sh deploy-package/.next | cut -f1)"
+          printf "${CYAN}%-30s${RESET} | %s\n" "public" "$(du -sh deploy-package/public | cut -f1)"
+          printf "${CYAN}%-30s${RESET} | %s\n" "config" "$(du -sh deploy-package/config | cut -f1)"
+          printf "${CYAN}%-30s${RESET} | %s\n" "other files" "$(du -sh deploy-package/*.json deploy-package/*.* 2>/dev/null | awk '{sum+=$1} END {print sum "K"}' || echo "N/A")"
+          echo -e "${BLUE}=============================================================${RESET}"
+          echo ""
+          # 압축
+          cd deploy-package
+          echo "[DEBUG][GHA] ⌛ 고압축 진행 중..."
+          tar -czf ../app-built.tar.gz --exclude-from=<(echo -e "node_modules/*/.cache\nnode_modules/*/coverage\nnode_modules/*/.nyc_output") .
+          cd ..
+          rm -rf deploy-package
+
+          FINAL_SIZE=$(du -sh app-built.tar.gz | cut -f1)
+
+          echo ""
+          echo -e "${BLUE}===================== 📦 Packaging Info ====================${RESET}"
+          printf "${CYAN}%-30s${RESET} | %s\n" "Full node_modules size" "$BEFORE_SIZE"
+          printf "${CYAN}%-30s${RESET} | %s\n" "Production node_modules size" "$AFTER_SIZE"
+          printf "${CYAN}%-30s${RESET} | %s\n" "Deploy package size" "$PACKAGE_SIZE"
+          printf "${CYAN}%-30s${RESET} | %s\n" "Final compressed size" "$FINAL_SIZE"
+          echo -e "${BLUE}=============================================================${RESET}"
+          echo ""
+          echo "[DEBUG][GHA] ✅ 배포용 파일 패키징 완료"
+
+      # 7) EC2에 배포
+      - name: Deploy to EC2
+        id: deploy
+        env:
+          BRANCH: ${{ steps.meta.outputs.name }}
+          PORT: ${{ steps.meta.outputs.port }}
+          DOMAIN: ${{ vars.DOMAIN }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        shell: bash
+        run: |
+          echo "[DEBUG][GHA] ⌛ SSH Key 설정 진행 중..."
+          mkdir -p ~/.ssh
+          echo "${EC2_SSH_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "[DEBUG][GHA] ✅ SSH Key 설정 완료"
+
+          echo "[DEBUG][GHA] ⌛ EC2 인스턴스로 파일 복사 진행 중..."
+          echo "[DEBUG][GHA] 🔍 복사 전 EC2 메모리: $(ssh -o StrictHostKeyChecking=no ubuntu@"${EC2_HOST}" "free -h | grep '^Mem:' | awk '{print \$3 \"/\" \$2}'")"
+
+          # EC2에서 메모리 모니터링 시작 (실시간 출력)
+          ssh -o StrictHostKeyChecking=no ubuntu@"${EC2_HOST}" "
+          (while true; do
+            CURRENT_MEM=\$(free -m | grep '^Mem:' | awk '{print \$3}')
+            TOTAL_MEM=\$(free -m | grep '^Mem:' | awk '{print \$2}')
+            PERCENT=\$(echo \"scale=1; \$CURRENT_MEM * 100 / \$TOTAL_MEM\" | bc -l)
+            echo \"[MONITOR] \$(date '+%H:%M:%S') - 메모리: \${CURRENT_MEM}MB/\${TOTAL_MEM}MB (\${PERCENT}%)\"
+            sleep 1
+          done) &
+          echo \$! > /tmp/monitor.pid
+          " &
+
+          # 파일 복사 실행
+          scp -o StrictHostKeyChecking=no app-built.tar.gz deploy/preview.nginx.tpl ubuntu@"${EC2_HOST}":/tmp/
+
+          # 모니터링 종료
+          ssh -o StrictHostKeyChecking=no ubuntu@"${EC2_HOST}" "
+          sleep 2
+          kill \$(cat /tmp/monitor.pid) 2>/dev/null || true
+          rm -f /tmp/monitor.pid
+          "
+
+          echo "[DEBUG][GHA] 🔍 복사 후 EC2 메모리: $(ssh -o StrictHostKeyChecking=no ubuntu@"${EC2_HOST}" "free -h | grep '^Mem:' | awk '{print \$3 \"/\" \$2}'")"
+          echo "[DEBUG][GHA] ✅ EC2 인스턴스로 파일 복사 완료"
+
+          echo "[DEBUG][GHA] ⌛ EC2 인스턴스 연결 진행 중..."
+          ssh -o StrictHostKeyChecking=no ubuntu@"${EC2_HOST}" bash -se <<'EOSSH'
+          set -euo pipefail
+
+          echo "[DEBUG][EC2] ✅ EC2 인스턴스 연결 완료"
+
+          BRANCH="${{ steps.meta.outputs.name }}"
+          BASE_PORT="${{ steps.meta.outputs.port }}"
+          DOMAIN="${{ vars.DOMAIN }}"
+          APP_DIR="/var/www/preview/${BRANCH}"
+
+          echo "[DEBUG][EC2] ✅ PREVIEW 파라미터:"
+          echo "[INFO] BRANCH=${BRANCH}"
+          echo "[INFO] BASE_PORT=${BASE_PORT}"
+          echo "[INFO] DOMAIN=${DOMAIN}"
+          echo "[INFO] APP_DIR=${APP_DIR}"
+
+          if [ -z "${BASE_PORT}" ]; then
+            echo "[FATAL] ✖️ BASE_PORT is empty"
+            exit 1
+          fi
+
+          FINAL_PORT="${BASE_PORT}"
+          echo "[DEBUG][EC2] ⌛ 이전 프로세스 정리 진행 중..."
+          pm2 delete "preview-${BRANCH}" || true
+          sudo fuser -k ${FINAL_PORT}/tcp || true
+          echo "[DEBUG][EC2] ✅ 이전 프로세스 정리 완료"
+
+          echo "[DEBUG][EC2] ⌛ 앱 디렉토리 정리 및 생성 진행 중..."
+          echo "[DEBUG][EC2] 🔍 정리 전 메모리: $(free -h | grep '^Mem:' | awk '{print $3 "/" $2}')"
+          sudo rm -rf "${APP_DIR}"
+          sudo mkdir -p "${APP_DIR}"
+          sudo chown -R ubuntu:ubuntu "${APP_DIR}"
+          echo "[DEBUG][EC2] ✅ 앱 디렉토리 정리 및 생성 완료"
+
+          echo "[DEBUG][EC2] ⌛ 빌드된 파일 압축 해제 진행 중..."
+          echo "[DEBUG][EC2] 🔍 압축 해제 전 메모리: $(free -h | grep '^Mem:' | awk '{print $3 "/" $2}')"
+
+          # EC2에서 압축 해제 중 메모리 모니터링
+          (while true; do
+            CURRENT_MEM=$(free -m | grep '^Mem:' | awk '{print $3}')
+            TOTAL_MEM=$(free -m | grep '^Mem:' | awk '{print $2}')
+            PERCENT=$(echo "scale=1; $CURRENT_MEM * 100 / $TOTAL_MEM" | bc -l)
+            echo "[MONITOR] $(date '+%H:%M:%S') - 메모리: ${CURRENT_MEM}MB/${TOTAL_MEM}MB (${PERCENT}%)"
+            sleep 1
+          done) &
+          MONITOR_PID=$!
+
+          tar -xzf /tmp/app-built.tar.gz -C "${APP_DIR}"
+          echo "[DEBUG][EC2] 🔍 압축 해제 직후 breakdown:"
+          cd "${APP_DIR}"
+          du -sh node_modules .next public config *.json 2>/dev/null
+          rm -f /tmp/app-built.tar.gz
+
+          # 모니터링 종료 전에 잠시 대기
+          sleep 3
+          kill $MONITOR_PID 2>/dev/null || true
+
+          echo "[DEBUG][EC2] 🔍 압축 해제 후 메모리: $(free -h | grep '^Mem:' | awk '{print $3 "/" $2}')"
+          echo "[DEBUG][EC2] ✅ 빌드된 파일 압축 해제 완료"
+
+          cd "${APP_DIR}"
+
+          echo "[DEBUG][EC2] ⌛ PM2 실행 진행 중..."
+          pm2 start "node_modules/.bin/next start -p ${FINAL_PORT}" --name "preview-${BRANCH}"
+          pm2 save
+          echo "[DEBUG][EC2] ✅ PM2 실행 완료"
+
+          echo "[DEBUG][EC2] ⌛ Nginx 설정 생성 진행 중..."
+          if [ ! -f /tmp/preview.nginx.tpl ]; then
+            echo "[FATAL] /tmp/preview.nginx.tpl not found"
+            exit 1
+          fi
+          export BRANCH DOMAIN FINAL_PORT
+          envsubst "\$BRANCH \$DOMAIN \$FINAL_PORT" < /tmp/preview.nginx.tpl \
+            | sudo tee /etc/nginx/conf.d/preview-${BRANCH}.conf >/dev/null
+          echo "[DEBUG][EC2] ✅ Nginx 설정 생성 완료"
+
+          echo "[DEBUG][EC2] 🔍 Rendered conf head:"
+          sudo sed -n "1,80p" /etc/nginx/conf.d/preview-${BRANCH}.conf || true
+
+          echo "[DEBUG][EC2] ⌛ Nginx 설정 테스트 및 재시작 진행 중..."
+          sudo nginx -t
+          if systemctl is-active --quiet nginx; then
+            sudo systemctl reload nginx || sudo nginx -s reload
+          else
+            sudo systemctl start nginx || sudo nginx
+          fi
+          echo "[DEBUG][EC2] ✅ Nginx 설정 테스트 및 재시작 완료"
+
+          echo "[DEBUG][EC2] 🔍 현재 Nginx 상태 확인..."
+          (systemctl status nginx --no-pager -l || true) | sed -n '1,20p'
+
+          echo "[DEBUG][EC2] 🔍 원본 헤더 확인..."
+          curl -sI -H "Host: ${BRANCH}.preview.${DOMAIN}" http://127.0.0.1 \
+            | egrep -i "http/|server|cache-control" || true
+
+          RED="\033[1;31m"
+          GREEN="\033[1;32m"
+          BLUE="\033[1;34m"
+          CYAN="\033[1;36m"
+          RESET="\033[0m"
+
+          echo ""
+          echo -e "${BLUE}===================== 📊 EC2 리소스 현황 =====================${RESET}"
+          MEM_INFO=$(free -m | awk '/^Mem:/ {printf "%dM/%dM (%d%%)", $3, $2, ($3/$2)*100}')
+          DISK_INFO=$(df -BG / | awk 'NR==2 {gsub("G","",$2); gsub("G","",$3); gsub("%","",$5); printf "%dG/%dG (%d%%)", $3, $2, $5}')
+          printf "${CYAN}%-15s${RESET} | %s\n" "Memory" "$MEM_INFO"
+          printf "${CYAN}%-15s${RESET} | %s\n" "Disk" "$DISK_INFO"
+          echo -e "${BLUE}=============================================================${RESET}"
+          echo ""
+
+          EOSSH
+
+          echo "preview_url=https://${BRANCH}.preview.${DOMAIN}" >> $GITHUB_OUTPUT
+          echo "branch=${BRANCH}" >> $GITHUB_OUTPUT
+          echo "port=${FINAL_PORT}" >> $GITHUB_OUTPUT
+
+      # 8) Preview Info 출력
+      - name: Print Preview Info
+        run: |
+          RED="\033[1;31m"
+          GREEN="\033[1;32m"
+          BLUE="\033[1;34m"
+          CYAN="\033[1;36m"
+          RESET="\033[0m"
+
+          echo ""
+          echo -e "${BLUE}====================== 🚀 Preview Info ======================${RESET}"
+          printf "${CYAN}%-15s${RESET} | %s\n" "BRANCH"        "${{ steps.deploy.outputs.branch }}"
+          printf "${CYAN}%-15s${RESET} | %s\n" "Preview URL"   "${{ steps.deploy.outputs.preview_url }}"
+          printf "${CYAN}%-15s${RESET} | %s\n" "Upstream Port" "${{ steps.meta.outputs.port }}"
+          echo -e "${BLUE}=============================================================${RESET}"
+          echo ""
