@@ -48,7 +48,46 @@
 - 만들고 비교하며 학습하는 리액트: https://www.inflearn.com/course/만들면서-학습하는-리액트
 #### 과제
 - 자동완성: https://github.com/yoeubi/react-search-autocomplete
-- TypeScript: Router 경로에서 파라미터 추출 타입 만들기
+- TypeScript: Router 경로에서 파라미터 추출 타입 만들기: https://github.com/Chiman2937/study/blob/main/%EB%B6%80%ED%8A%B8%EC%BA%A0%ED%94%84-%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C/%EC%9E%90%EB%A3%8C%EB%B0%B1%EC%97%85/Typescript%20%EA%B3%BC%EC%A0%9C%3A%20Router%20%EA%B2%BD%EB%A1%9C%EC%97%90%EC%84%9C%20%ED%8C%8C%EB%9D%BC%EB%AF%B8%ED%84%B0%20%EC%B6%94%EC%B6%9C%20%ED%83%80%EC%9E%85%20%EB%A7%8C%EB%93%A4%EA%B8%B0.md
+<details>
+  <summary>답안</summary>
+
+```ts
+type ExtractParams<S extends string> =
+  S extends ${infer _Start}/:${infer Param}/${infer Rest}
+    ? Merge<{ [K in Param]: string }, ExtractParams</${Rest}>>
+    : S extends ${infer _Start}/:${infer Param}
+      ? { [K in Param]: string }
+      : {};
+
+type Merge<A, B> = A & B;
+
+type RouteHandler<P extends string> = (params: ExtractParams<P>) => void;
+
+function registerRoute<Path extends string>(
+  path: Path,
+  handler: RouteHandler<Path>
+) {
+  // 실제 서버라면 여기에 라우터 등록 로직이 들어갈 수 있음
+  console.log(✅ 등록된 라우트: ${path});
+}
+
+const routes = {
+  getUser: '/users/:userId',
+  getPost: '/posts/:postId',
+} as const;
+
+registerRoute(routes.getUser, (params) => {
+  // 타입 자동완성 됨!
+  console.log(params.userId);
+});
+
+registerRoute(routes.getPost, (params) => {
+  console.log(params.postId);
+});
+```
+  
+</details>
 
 #### 면접때 알아놓으면 좋은 것들
 - React란 무엇인가요?
