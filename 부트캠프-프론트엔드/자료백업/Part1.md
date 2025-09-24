@@ -112,7 +112,7 @@ registerRoute(routes.getPost, (params) => {
 </details>
 
 <details>
-  <summary><p>어떻게 공부해야할까?</p></summary>
+  <summary>어떻게 공부해야할까?</summary>
 [index (1).md](https://github.com/user-attachments/files/22516374/index.1.md)
 
 🎯 지금 가장 중요한 것
