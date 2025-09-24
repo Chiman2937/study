@@ -41,11 +41,13 @@ SOP 정책에 대한 예외를 두는 메커니즘입니다. 즉, 서버가 HTTP
 - 블로그 추천: https://www.developerway.com/
 - 오픈채팅 참여(채용 관련 글 및 유용한 FE관련 자료가 올라옵니다.): https://open.kakao.com/o/g4xYSdee
 - 오픈소스 도큐먼트를 AI와 읽기: https://deepwiki.com/
-
+- 가장 쉬운 AI 웹개발 with Boaz: https://www.youtube.com/@withBoaz
+- 테크톡: https://www.youtube.com/playlist?list=PLgXGHBqgT2TvpJ_p9L_yZKPifgdBOzdVH
+- 기술 관련 뉴스: https://news.hada.io/
+- AI로 어떻게 개발을 가속화 하는가 (슬라이드쇼): https://drive.google.com/file/d/1SJ7-1YXo4r4pkHDuMdKLR9NtgbUsSRoZ/view
 #### 책 추천
-Advanced React
-advanced-react.pdf
-Web Performance Fundamentals
-web-perf-fundamentals-v1.pdf
+Advanced React: https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy9mODRlZmMzNzg3YzRmNGFhL0VZMnk1enpsUHZOTWdLcHhyQ25aSXVjQjl2dmVSRlI3LTlkclJqaTFWZEZVYUE%5FZT14d05DM0c&cid=F84EFC3787C4F4AA&id=F84EFC3787C4F4AA%21s3ce7b28d3ee54cf380aa71ac29d922e7&parId=F84EFC3787C4F4AA%21538&o=OneUp
+Web Performance Fundamentals: https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy9mODRlZmMzNzg3YzRmNGFhL0VlcV90VDhNZWRaS21KMlE4NWw0RkJnQlpaSkZRdHpyb2piWXNTZERRNy1CclE%5FZT11WjRFRDY&cid=F84EFC3787C4F4AA&id=F84EFC3787C4F4AA%21s3fb5bfea790c4ad6989d90f399781418&parId=F84EFC3787C4F4AA%21538&o=OneUp
+
 
 ## 멘토님 코멘트
