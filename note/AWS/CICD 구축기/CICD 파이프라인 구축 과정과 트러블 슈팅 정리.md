@@ -1,4 +1,4 @@
-# CI/CD 구축 과정 정리
+# CI/CD 구축 과정과 트러블 슈팅 내용 정리
 
 [[🔗 작업 배경과 구현 목표]](https://github.com/Chiman2937/study/blob/main/note/AWS/CICD%20%EA%B5%AC%EC%B6%95%EA%B8%B0/1.%20%EC%9E%91%EC%97%85%20%EB%B0%B0%EA%B2%BD%EA%B3%BC%20%EA%B5%AC%ED%98%84%20%EB%AA%A9%ED%91%9C.md)
 
