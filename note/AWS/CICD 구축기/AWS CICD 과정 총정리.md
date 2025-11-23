@@ -194,3 +194,204 @@ EC2 관리 폴더 구조
 	├── preview-feature-login.conf   # feature-login.preview.wego.link
 	└── preview-feature-signup.conf  # feature-signup.preview.wego.link
 ```
+
+명령어 정리
+```
+# ============================================
+# 디스크 용량 확인
+# ============================================
+
+# EC2 인스턴스 전체 용량 확인
+df -h
+
+# 특정 디렉토리 용량 확인
+du -sh /home/ubuntu
+
+# 현재 디렉토리 기준 하위 폴더별 용량
+du -h --max-depth=1
+
+# 용량 큰 순서대로 정렬
+du -h --max-depth=1 | sort -hr
+
+# 특정 폴더 용량 확인
+du -sh node_modules
+
+# 현재 디렉토리 전체 용량
+du -sh
+
+
+# ============================================
+# 메모리 확인
+# ============================================
+
+# 메모리 사용량 확인 (사람이 읽기 쉽게)
+free -h
+
+# 실시간 메모리/CPU 사용량 (종료: q)
+htop
+# 또는
+top
+
+
+# ============================================
+# PM2 관련
+# ============================================
+
+# PM2 프로세스 목록
+pm2 list
+
+# 특정 앱 로그 확인
+pm2 logs wego-production
+
+# 최근 N줄만 보기
+pm2 logs wego-production --lines 50
+
+# 로그 초기화
+pm2 flush
+
+# PM2 프로세스 상태 (CPU, 메모리)
+pm2 monit
+
+# 특정 앱 재시작
+pm2 reload wego-production
+
+# 특정 앱 중지
+pm2 stop wego-production
+
+# 특정 앱 삭제
+pm2 delete wego-production
+
+
+# ============================================
+# Nginx 관련
+# ============================================
+
+# Nginx 설정 테스트
+sudo nginx -t
+
+# Nginx 재시작
+sudo systemctl reload nginx
+
+# Nginx 상태 확인
+sudo systemctl status nginx
+
+# Nginx 설정 파일 목록
+ls -la /etc/nginx/conf.d/
+
+# 특정 설정 파일 내용 확인
+cat /etc/nginx/conf.d/main.conf
+
+# Nginx 에러 로그 확인
+sudo tail -f /var/log/nginx/error.log
+
+# Nginx 액세스 로그 확인
+sudo tail -f /var/log/nginx/access.log
+
+
+# ============================================
+# 파일/디렉토리 관리
+# ============================================
+
+# 현재 디렉토리의 파일/폴더 목록 (상세)
+ls -lah
+
+# 파일 내용 보기 (전체)
+cat file.txt
+
+# 파일 내용 보기 (처음 20줄)
+head -20 file.txt
+
+# 파일 내용 보기 (마지막 20줄)
+tail -20 file.txt
+
+# 실시간 로그 확인 (파일이 업데이트되면 자동 표시)
+tail -f /var/log/app.log
+
+# 파일/폴더 삭제 (강제)
+rm -rf folder_name
+
+# 파일/폴더 복사
+cp -r source/ destination/
+
+# 파일/폴더 이동
+mv source/ destination/
+
+
+# ============================================
+# 네트워크/포트 확인
+# ============================================
+
+# 특정 포트 사용 확인
+sudo lsof -i :3000
+
+# 모든 리스닝 포트 확인
+sudo netstat -tlnp
+
+# 또는
+sudo ss -tlnp
+
+# 외부 접속 테스트 (로컬에서)
+curl http://localhost:3000
+
+# HTTP 헤더 확인
+curl -I http://localhost:3000
+
+
+# ============================================
+# 프로세스 관리
+# ============================================
+
+# 특정 프로세스 찾기
+ps aux | grep node
+
+# 프로세스 강제 종료
+kill -9 <PID>
+
+# 포트로 프로세스 찾아서 종료
+sudo lsof -ti:3000 | xargs kill -9
+
+
+# ============================================
+# 시스템 정보
+# ============================================
+
+# Ubuntu 버전 확인
+lsb_release -a
+
+# Node.js 버전
+node -v
+
+# pnpm 버전
+pnpm -v
+
+# 현재 사용자
+whoami
+
+# 시스템 가동 시간
+uptime
+
+
+# ============================================
+# Git (배포 디버깅용)
+# ============================================
+
+# 현재 브랜치 확인
+git branch
+
+# 마지막 커밋 확인
+git log -1
+
+# 변경된 파일 확인
+git status
+
+
+# ============================================
+# 유용한 단축키
+# ============================================
+
+# Ctrl + C: 실행 중인 명령어 중단
+# Ctrl + Z: 실행 중인 명령어 일시 중지
+# Ctrl + L: 터미널 화면 클리어 (또는 clear 명령어)
+# Ctrl + R: 명령어 히스토리 검색
+# ↑/↓ 화살표: 이전 명령어 탐색
+```
