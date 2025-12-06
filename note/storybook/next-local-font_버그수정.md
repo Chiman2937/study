@@ -136,6 +136,24 @@ return dedent`@font-face {
 }`;
 ```
 
+
+1. **Vite의 @fs 동작 원리**
+   - `/@fs/` = 절대 경로 파일 서빙을 위한 특수 prefix
+   - `server.fs.allow` 설정으로 접근 제어
+
+2. **패키지 간 차이점**
+   - `@storybook/nextjs`: Webpack 기반, 메인 저장소
+   - `vite-plugin-storybook-nextjs`: Vite 기반, 독립 저장소
+   - 각각 별도로 watch/link 필요
+
+3. **디버깅 과정**
+   - Network 탭 확인 → 404 에러 발견
+   - 생성된 CSS 확인 → 문법 오류 발견
+   - 소스 코드 추적 → 근본 원인 파악
+
+## 참고 링크
+- PR: [링크 추가 예정]
+- Related: https://github.com/storybookjs/storybook/pull/32998
 src 속성 맨 뒤에 ; 이 실제로 빠져있었다.
 이것을 수정하고 다시 스토리북을 빌드한 후 font파일이 정상적으로 불러와지는걸 확인할 수 있었다.
 
