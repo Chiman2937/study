@@ -136,6 +136,10 @@ return dedent`@font-face {
 }`;
 ```
 
+src 속성 맨 뒤에 ; 이 실제로 빠져있었다.
+이것을 수정하고 다시 스토리북을 빌드한 후 font파일이 정상적으로 불러와지는걸 확인할 수 있었다.
+
+<img width="1574" height="394" alt="image" src="https://github.com/user-attachments/assets/12e34809-8f30-4ec2-9c01-a29a89ef088f" />
 
 1. **Vite의 @fs 동작 원리**
    - `/@fs/` = 절대 경로 파일 서빙을 위한 특수 prefix
@@ -154,7 +158,3 @@ return dedent`@font-face {
 ## 참고 링크
 - PR: [링크 추가 예정]
 - Related: https://github.com/storybookjs/storybook/pull/32998
-src 속성 맨 뒤에 ; 이 실제로 빠져있었다.
-이것을 수정하고 다시 스토리북을 빌드한 후 font파일이 정상적으로 불러와지는걸 확인할 수 있었다.
-
-<img width="1574" height="394" alt="image" src="https://github.com/user-attachments/assets/12e34809-8f30-4ec2-9c01-a29a89ef088f" />
