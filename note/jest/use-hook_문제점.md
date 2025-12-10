@@ -76,7 +76,7 @@ await waitFor를 통해 use hook과 useGetUser까지 await하면 데이터를 �
 
     await act(() => ...)
 ```
-result를 await를 해야하니 act를 사용해라... 라길래 아래처럼 구문을 변경해봤다.
+result를 await를 해야하니 act를 사용해라... 라길래 아래처럼 구문을 변경해서 해결할 수 있었다.
 
 ```tsx
 const renderWithQueryClient = async (component: React.ReactElement) => {
