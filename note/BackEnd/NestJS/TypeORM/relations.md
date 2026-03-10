@@ -1,8 +1,8 @@
 # TypeORM Relations
 
-## OneToOne
+## 1. OneToOne
 
-### 1. 기본 설정
+### 1-1. 기본 설정
 
 두 엔티티가 1:1로 연결될 때 사용. **`@JoinColumn()`이 붙은 쪽의 테이블에 FK 컬럼이 생성된다.**
 
@@ -36,9 +36,9 @@ export class ProfileModel {
 
 ---
 
-## OneToMany / ManyToOne
+## 2. OneToMany / ManyToOne
 
-### 1. 기본 설정
+### 2-1. 기본 설정
 
 1:N 관계. **`ManyToOne` 쪽에 자동으로 FK 컬럼이 생성된다** (`@JoinColumn` 불필요).
 
@@ -70,9 +70,9 @@ export class PostsModel {
 
 ---
 
-## ManyToMany
+## 3. ManyToMany
 
-### 1. 기본 설정
+### 3-1. 기본 설정
 
 N:M 관계. **`@JoinTable()`이 붙은 쪽에서 중간(Junction) 테이블을 자동으로 생성한다.**
 
@@ -97,7 +97,7 @@ export class TagModel {
 
 ---
 
-## 공통 옵션
+## 4. 공통 옵션
 
 | 옵션 | 설명 |
 |---|---|
@@ -106,7 +106,7 @@ export class TagModel {
 | `nullable` | FK null 허용 여부. 기본값 `true` |
 | `onDelete` | 부모 삭제 시 동작: `CASCADE` / `SET NULL` / `RESTRICT` |
 
-### 1. `cascade`
+### 4-1. `cascade`
 
 부모 엔티티를 저장/삭제할 때 자식 엔티티에도 자동으로 반영.
 
@@ -117,7 +117,7 @@ export class TagModel {
 posts: PostsModel[];
 ```
 
-### 2. `eager`
+### 4-2. `eager`
 
 `find()` 호출 시 관계 엔티티를 자동으로 함께 로딩. 기본값은 `false`.
 
@@ -130,7 +130,7 @@ author: UsersModel;
 
 > `eager: true`는 항상 로딩되므로 불필요한 경우 성능에 영향을 줄 수 있다. 필요할 때만 사용하는 것이 권장된다.
 
-### 3. `nullable`
+### 4-3. `nullable`
 
 FK 컬럼의 NULL 허용 여부. 기본값은 `true`.
 
@@ -141,7 +141,7 @@ FK 컬럼의 NULL 허용 여부. 기본값은 `true`.
 author: UsersModel;
 ```
 
-### 4. `onDelete`
+### 4-4. `onDelete`
 
 부모 엔티티 삭제 시 자식 엔티티의 처리 방식.
 
